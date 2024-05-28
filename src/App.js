@@ -1,6 +1,5 @@
 import "./App.css";
 import MainHeader from "./components/layouts/header";
-import MainFooter from "./components/layouts/footer";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +9,7 @@ import { Flex, useMantineColorScheme } from "@mantine/core";
 
 function App() {
   const { colorScheme } = useMantineColorScheme();
+
   return (
     <>
       <div

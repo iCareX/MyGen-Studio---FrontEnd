@@ -1,0 +1,20 @@
+.wrapper {
+  height: 100vh;
+  display: flex;
+  background-size: cover;
+  border: 1px solid gray;
+}
+
+.form {
+  border-right: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
+  min-height: rem(900px);
+  margin: auto;
+  border-radius: 8px;
+  width: 500px;
+  padding-top: rem(80px);
+}
+
+.title {
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+  font-family: Greycliff CF, var(--mantine-font-family);
+}

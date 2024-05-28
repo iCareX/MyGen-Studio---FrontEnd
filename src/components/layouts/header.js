@@ -1,7 +1,7 @@
-import { ActionIcon, Avatar, Box, Drawer, Flex, Menu, NavLink, Text, rem, Switch, useMantineColorScheme } from "@mantine/core";
+import { ActionIcon, Avatar, Box, Drawer, Flex, Menu, NavLink, Text, rem, useMantineColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconAnalyze, IconFileSearch, IconLighter, IconLogout, IconMenu2, IconMoon, IconSettings } from "@tabler/icons-react";
-import { useState } from "react";
+import { IconLogout, IconMenu2, IconMoon } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DarkSwitch from "../switch/DarkSwitch";
 
@@ -10,6 +10,8 @@ export default function MainHeader() {
   const [opened, { open, close }] = useDisclosure(false);
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
+
+  let user;
 
   const [navList, setNavList] = useState([
     {
@@ -27,6 +29,10 @@ export default function MainHeader() {
           label: "IdeaAI development feedback",
           link: "_development_feedback",
         },
+        {
+          label: "Control tower",
+          link: "control_tower",
+        },
       ],
     },
     {
@@ -34,6 +40,17 @@ export default function MainHeader() {
       menu: [],
     },
   ]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("mygen_auth");
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    user = JSON.parse(localStorage.getItem("mygen_auth"));
+    console.log("====", user);
+    if (!user) navigate("/login");
+  }, []);
 
   return (
     <header className=" border-b-[1px]">
@@ -52,9 +69,14 @@ export default function MainHeader() {
               <IconMenu2 />
             </ActionIcon>
           </Box>
-          <Text fw={600} size="lg">
-            MyGen Studio
-          </Text>
+          <Flex align={"end"} gap={"xs"}>
+            <Text fw={700} size="lg">
+              MyGen Studio
+            </Text>
+            <Text fw={400} size="sm" mb={"3"}>
+              by icarex
+            </Text>
+          </Flex>
         </Flex>
         <Flex align={"center"} gap={"xl"}>
           <Menu shadow="md" width={240}>
@@ -74,16 +96,11 @@ export default function MainHeader() {
                 </Box>
               </Menu.Item>
               <Menu.Divider />
-              <Menu.Item leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>Settings</Menu.Item>
-              <Menu.Item leftSection={<IconAnalyze style={{ width: rem(14), height: rem(14) }} />}>Analytics</Menu.Item>
-              <Menu.Item leftSection={<IconLighter style={{ width: rem(14), height: rem(14) }} />}>Upgrade Plan</Menu.Item>
-              <Menu.Divider />
-              <Menu.Item leftSection={<IconFileSearch style={{ width: rem(14), height: rem(14) }} />}>Docs</Menu.Item>
               <Menu.Item leftSection={<IconMoon style={{ width: rem(14), height: rem(14) }} />} rightSection={<DarkSwitch />}>
                 Dark Mode
               </Menu.Item>
               <Menu.Divider />
-              <Menu.Item color="red" leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}>
+              <Menu.Item color="red" leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />} onClick={handleSignOut}>
                 Log Out
               </Menu.Item>
             </Menu.Dropdown>
