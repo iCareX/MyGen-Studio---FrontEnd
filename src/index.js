@@ -10,6 +10,7 @@ import ChatTitleEditModal from "./components/modals/chat/Edit";
 import { ModalsProvider } from "@mantine/modals";
 import ChatShareModal from "./components/modals/chat/Share";
 import ChatDeleteModal from "./components/modals/chat/Delete";
+import { RecoilRoot } from "recoil";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -35,19 +36,21 @@ const theme = createTheme({
 
 root.render(
   <React.StrictMode>
-    <MantineProvider theme={theme}>
-      <ModalsProvider
-        modals={{
-          chatTitleEdit: ChatTitleEditModal,
-          chatShare: ChatShareModal,
-          chatDelete: ChatDeleteModal,
-        }}
-      >
-        <RouterProvider router={router}>
-          <App />
-        </RouterProvider>
-      </ModalsProvider>
-    </MantineProvider>
+    <RecoilRoot>
+      <MantineProvider theme={theme}>
+        <ModalsProvider
+          modals={{
+            chatTitleEdit: ChatTitleEditModal,
+            chatShare: ChatShareModal,
+            chatDelete: ChatDeleteModal,
+          }}
+        >
+          <RouterProvider router={router}>
+            <App />
+          </RouterProvider>
+        </ModalsProvider>
+      </MantineProvider>
+    </RecoilRoot>
   </React.StrictMode>
 );
 
