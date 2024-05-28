@@ -4,14 +4,18 @@ import { IconLogout, IconMenu2, IconMoon } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DarkSwitch from "../switch/DarkSwitch";
+import { useRecoilValue } from "recoil";
+import { userTokenState } from "../atoms/userAtoms";
 
 export default function MainHeader() {
   const { colorScheme } = useMantineColorScheme();
+  const userToken = useRecoilValue(userTokenState);
+
   const [opened, { open, close }] = useDisclosure(false);
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
 
-  let user;
+  const [user, setUser] = useState();
 
   const [navList, setNavList] = useState([
     {
@@ -46,12 +50,6 @@ export default function MainHeader() {
     navigate("/login");
   };
 
-  useEffect(() => {
-    user = JSON.parse(localStorage.getItem("mygen_auth"));
-    console.log("====", user);
-    if (!user) navigate("/login");
-  }, []);
-
   return (
     <header className=" border-b-[1px]">
       <Flex w={"100%"} align={"center"} justify={"space-between"} py={"sm"} px={"md"}>
@@ -82,14 +80,14 @@ export default function MainHeader() {
           <Menu shadow="md" width={240}>
             <Menu.Target>
               <Flex align={"center"} gap={"sm"} className="hover:cursor-pointer">
-                <Text>Choace</Text>
+                <Text>{userToken.name}</Text>
                 <Avatar src={""} size={"md"} radius={"xl"} />
               </Flex>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item leftSection={<Avatar radius={"md"} src={""} />}>
                 <Box>
-                  <Text fw={600}>Choace</Text>
+                  <Text fw={600}>{userToken?.name}</Text>
                   <Text color="gray" fw={500} size="xs">
                     acedev0427@gmail.com
                   </Text>

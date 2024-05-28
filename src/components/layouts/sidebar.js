@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 export default function MainSidebar(props) {
   const { colorScheme } = useMantineColorScheme();
   const navigate = useNavigate();
-  const { show, setShow } = props;
-
-  console.log("===", show);
 
   const [navList, setNavList] = useState([
     {
