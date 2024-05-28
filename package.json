@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@mantine/core": "^7.10.0",
+    "@mantine/form": "^7.10.0",
     "@mantine/hooks": "^7.10.0",
     "@mantine/modals": "^7.10.0",
     "@tabler/icons-react": "^3.5.0",

@@ -5,6 +5,8 @@ import NewChat from "../components/chat/newChat";
 import ChatComponent from "../components/chat/chatComponent";
 import App from "../App";
 import ErorrPage from "../components/pages/errors/ErrorPage";
+import AgentComponent from "../components/chat/agentComponent";
+import SignIn from "../components/pages/auth/signin";
 
 const router = createBrowserRouter([
   {
@@ -21,17 +23,25 @@ const router = createBrowserRouter([
       // },
       {
         path: "ideaAI_fast_assessment",
-        element: <ChatComponent />,
+        element: <AgentComponent />,
       },
       {
         path: "ideaAI_executive_assessment",
-        element: <ChatComponent />,
+        element: <AgentComponent />,
       },
       {
         path: "_development_feedback",
+        element: <AgentComponent />,
+      },
+      {
+        path: "control_tower",
         element: <ChatComponent />,
       },
     ],
+  },
+  {
+    path: "/login",
+    element: <SignIn />,
   },
   {
     path: "*",

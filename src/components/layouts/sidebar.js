@@ -1,6 +1,6 @@
 import { Box, Flex, NavLink, Text, useMantineColorScheme } from "@mantine/core";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function MainSidebar(props) {
   const { colorScheme } = useMantineColorScheme();
@@ -24,6 +24,10 @@ export default function MainSidebar(props) {
         {
           label: "IdeaAI development feedback",
           link: "_development_feedback",
+        },
+        {
+          label: "Control tower",
+          link: "control_tower",
         },
       ],
     },

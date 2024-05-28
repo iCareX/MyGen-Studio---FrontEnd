@@ -1,21 +1,5 @@
-import {
-  ActionIcon,
-  Avatar,
-  Box,
-  Button,
-  Drawer,
-  Flex,
-  Image,
-  Loader,
-  Paper,
-  ScrollArea,
-  SimpleGrid,
-  Text,
-  Textarea,
-  useMantineColorScheme,
-} from "@mantine/core";
-import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
-import { IconEye, IconSend, IconTemperatureMinus } from "@tabler/icons-react";
+import { ActionIcon, Avatar, Box, Flex, Image, Loader, Paper, ScrollArea, SimpleGrid, Text, Textarea, useMantineColorScheme } from "@mantine/core";
+import { IconSend } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import axios from "axios";
@@ -24,7 +8,7 @@ import { toast } from "react-toastify";
 import moment from "moment";
 
 export default function ChatComponent() {
-  const [opened, { open, close }] = useDisclosure(false);
+  // const [opened, { open, close }] = useDisclosure(false);
   const { colorScheme } = useMantineColorScheme();
 
   const [loading, setLoading] = useState(false);
@@ -72,7 +56,7 @@ export default function ChatComponent() {
 
   const getPrediction = async () => {
     setLoading(true);
-    const ngrok_url = "https://3305-35-233-186-42.ngrok-free.app";
+    const ngrok_url = process.env.REACT_APP_PUBLIC_URL;
     let input_data = {
       input: prompt,
     };
