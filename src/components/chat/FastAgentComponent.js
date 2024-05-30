@@ -15,7 +15,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconPlus, IconSend } from "@tabler/icons-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { FastAssessmentAPI, FastAssessmentResultFastAPI } from "../apis/FastAssessmentAPI";
 import moment from "moment/moment";
@@ -28,6 +28,8 @@ export default function FastAgentComponent() {
   const [fields, setFields] = useState([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }]);
   const [jobId, setJobId] = useState(null);
   const [results, setResults] = useState([]);
+
+  const [intervalId, setInvetervalId] = useState();
 
   const [options, setOptions] = useState([
     "Problem solving",
@@ -107,7 +109,6 @@ export default function FastAgentComponent() {
       try {
         const resultResponse = await FastAssessmentResultFastAPI(jobId);
         const resultData = resultResponse.data;
-        console.log("====", resultData);
         if (resultData.status && resultData.status !== "pending") {
           clearInterval(interval);
           setResults((results) => [...results, { assessment: resultData.assessment, date: moment().format("MM/DD/YYYY, h:mm:ss a") }]);
@@ -125,15 +126,36 @@ export default function FastAgentComponent() {
         toast.error("Network Error");
       }
     }, 5000);
+    setInvetervalId(interval);
   };
 
   const handleToggle = (index, key) => {
     const uniqueId = `${index}-${key}`;
+
     setOpenedStates((prevOpenedStates) => ({
       ...prevOpenedStates,
       [uniqueId]: !prevOpenedStates[uniqueId],
     }));
   };
+
+  useEffect(() => {
+    const initialStates = {};
+    results.forEach((item, index) => {
+      Object.keys(item.assessment).forEach((key) => {
+        const uniqueId = `${index}-${key}`;
+        initialStates[uniqueId] = true;
+      });
+    });
+    setOpenedStates(initialStates);
+  }, [results]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
 
   return (
     <Box w={"100%"} h={"100%"}>
@@ -217,7 +239,7 @@ export default function FastAgentComponent() {
                               )}
                             </ActionIcon>
                           </Flex>
-                          <Collapse in={openedStates[`${index}-${key}`] || true} p={"md"}>
+                          <Collapse in={openedStates[`${index}-${key}`] !== false} p={"md"}>
                             <Text>{item.assessment[key]}</Text>
                           </Collapse>
                         </Paper>
