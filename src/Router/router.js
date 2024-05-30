@@ -13,10 +13,10 @@ const router = createBrowserRouter([
     path: "",
     element: <App />,
     children: [
-      {
-        index: true,
-        element: <NewChat />,
-      },
+      // {
+      //   index: true,
+      //   element: <NewChat />,
+      // },
       // {
       //   path: ":id",
       //   element: <ChatComponent />,

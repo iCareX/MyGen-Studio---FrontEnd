@@ -50,6 +50,10 @@ export default function MainHeader() {
     navigate("/login");
   };
 
+  useEffect(() => {
+    if (!userToken) navigate("/login");
+  }, []);
+
   return (
     <header className=" border-b-[1px]">
       <Flex w={"100%"} align={"center"} justify={"space-between"} py={"sm"} px={"md"}>
