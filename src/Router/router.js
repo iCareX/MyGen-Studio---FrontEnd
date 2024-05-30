@@ -5,8 +5,10 @@ import NewChat from "../components/chat/newChat";
 import ChatComponent from "../components/chat/chatComponent";
 import App from "../App";
 import ErorrPage from "../components/pages/errors/ErrorPage";
-import AgentComponent from "../components/chat/agentComponent";
 import SignIn from "../components/pages/auth/signin";
+import FastAgentComponent from "../components/chat/FastAgentComponent";
+import DevelopmentFeedbackAgentComponent from "../components/chat/DevelopmentFeedbackAgentComponent";
+import PriorityAgentComponent from "../components/chat/PriorityAgentComponent";
 
 const router = createBrowserRouter([
   {
@@ -22,16 +24,16 @@ const router = createBrowserRouter([
       //   element: <ChatComponent />,
       // },
       {
-        path: "ideaAI_fast_assessment",
-        element: <AgentComponent />,
+        path: "fast_assessment",
+        element: <FastAgentComponent />,
       },
       {
-        path: "ideaAI_executive_assessment",
-        element: <AgentComponent />,
+        path: "priority_assessment",
+        element: <PriorityAgentComponent />,
       },
       {
-        path: "_development_feedback",
-        element: <AgentComponent />,
+        path: "development_feedback",
+        element: <DevelopmentFeedbackAgentComponent />,
       },
       {
         path: "control_tower",

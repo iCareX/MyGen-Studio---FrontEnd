@@ -16,8 +16,12 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userToken) navigate("/ideaAI_fast_assessment");
-  });
+    if (userToken) {
+      navigate("/fast_assessment");
+    } else {
+      navigate("/login");
+    }
+  }, [userToken, navigate]);
 
   return (
     <>
