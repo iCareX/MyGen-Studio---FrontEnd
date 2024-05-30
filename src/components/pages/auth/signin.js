@@ -36,7 +36,7 @@ export default function SignIn() {
         })
       );
       setTimeout(() => {
-        navigate("/");
+        navigate("/ideaAI_fast_assessment");
       }, 3000);
     } else {
       toast.error("Username and Password is not correct");

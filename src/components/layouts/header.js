@@ -22,16 +22,16 @@ export default function MainHeader() {
       type: "Agents",
       menu: [
         {
-          label: "IdeaAI fast assessment",
-          link: "ideaAI_fast_assessment",
+          label: "Fast assessment",
+          link: "fast_assessment",
         },
         {
-          label: "IdeaAI executive assessment",
-          link: "ideaAI_executive_assessment",
+          label: "Priorities assessment",
+          link: "priority_assessment",
         },
         {
-          label: "IdeaAI development feedback",
-          link: "_development_feedback",
+          label: "Development feedback",
+          link: "development_feedback",
         },
         {
           label: "Control tower",
@@ -49,6 +49,10 @@ export default function MainHeader() {
     localStorage.removeItem("mygen_auth");
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (!userToken) navigate("/login");
+  }, []);
 
   return (
     <header className=" border-b-[1px]">

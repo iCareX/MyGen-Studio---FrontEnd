@@ -11,16 +11,16 @@ export default function MainSidebar(props) {
       type: "Agents",
       menu: [
         {
-          label: "IdeaAI fast assessment",
-          link: "ideaAI_fast_assessment",
+          label: "Fast assessment",
+          link: "fast_assessment",
         },
         {
-          label: "IdeaAI executive assessment",
-          link: "ideaAI_executive_assessment",
+          label: "Priorities assessment",
+          link: "priority_assessment",
         },
         {
-          label: "IdeaAI development feedback",
-          link: "_development_feedback",
+          label: "Development feedback",
+          link: "development_feedback",
         },
         {
           label: "Control tower",
@@ -46,12 +46,6 @@ export default function MainSidebar(props) {
       ],
     },
   ]);
-
-  const [titleEdit, setTitleEdit] = useState("");
-
-  const handleNewChat = () => {
-    navigate("/");
-  };
 
   return (
     <Box h={"100%"} w={420} p={"xs"} className="border-r-[1px] sm:block hidden">
