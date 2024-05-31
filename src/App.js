@@ -1,6 +1,6 @@
 import "./App.css";
 import MainHeader from "./components/layouts/header";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "@mantine/core/styles.css";
@@ -15,13 +15,15 @@ function App() {
   const userToken = useRecoilValue(userTokenState);
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   useEffect(() => {
     if (userToken) {
-      navigate("/fast_assessment");
+      if (location.pathname === "/" || location.pathname === "") navigate("/fast_assessment");
     } else {
       navigate("/login");
     }
-  }, [userToken, navigate]);
+  }, [userToken, navigate, location.pathname]);
 
   return (
     <>

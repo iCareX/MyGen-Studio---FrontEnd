@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Flex, Loader, NumberInput, Paper, ScrollArea, Select, Text, Title, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 import { IconPlus, IconSend } from "@tabler/icons-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
 import { PrioritiesAssessmentAPI, PrioritiesAssessmentResultAPI } from "../apis/PriorityAgentAPI";
@@ -13,6 +13,8 @@ export default function PriorityAgentComponent() {
   const [fields, setFields] = useState([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }]);
   const [jobId, setJobId] = useState(null);
   const [results, setResults] = useState([]);
+
+  const [intervalId, setInvetervalId] = useState();
 
   const [options, setOptions] = useState([
     "Problem solving",
@@ -108,7 +110,16 @@ export default function PriorityAgentComponent() {
         toast.error("Network Error");
       }
     }, 5000);
+    setInvetervalId(interval);
   };
+
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
 
   return (
     <Box w={"100%"} h={"100%"}>

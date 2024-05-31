@@ -15,7 +15,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconPlus, IconSend } from "@tabler/icons-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
 import { DevelopmentFeedbackAPI, DevelopmentFeedbackResultAPI } from "../apis/DevelopmentAgentAPI";
@@ -28,6 +28,8 @@ export default function DevelopmentFeedbackAgentComponent() {
   const [fields, setFields] = useState([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }]);
   const [jobId, setJobId] = useState(null);
   const [results, setResults] = useState([]);
+
+  const [intervalId, setInvetervalId] = useState();
 
   const [options, setOptions] = useState([
     "Problem solving",
@@ -125,6 +127,7 @@ export default function DevelopmentFeedbackAgentComponent() {
         toast.error("Network Error");
       }
     }, 5000);
+    setInvetervalId(interval);
   };
 
   const handleToggle = (index, key) => {
@@ -134,7 +137,26 @@ export default function DevelopmentFeedbackAgentComponent() {
       [uniqueId]: !prevOpenedStates[uniqueId],
     }));
   };
-  console.log("====", results);
+
+  useEffect(() => {
+    const initialStates = {};
+    results.forEach((item, index) => {
+      Object.keys(item.assessment).forEach((key) => {
+        const uniqueId = `${index}-${key}`;
+        initialStates[uniqueId] = true;
+      });
+    });
+    setOpenedStates(initialStates);
+  }, [results]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
+
   return (
     <Box w={"100%"} h={"100%"}>
       <ScrollArea viewportRef={viewport} scrollHideDelay={4000} className="h-[calc(100vh-64px)]">
@@ -217,7 +239,7 @@ export default function DevelopmentFeedbackAgentComponent() {
                               )}
                             </ActionIcon>
                           </Flex>
-                          <Collapse in={openedStates[`${index}-${key}`] || true} p={"md"}>
+                          <Collapse in={openedStates[`${index}-${key}`] !== false} p={"md"}>
                             <Text>{item.assessment[key]}</Text>
                           </Collapse>
                         </Paper>
