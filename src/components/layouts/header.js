@@ -48,6 +48,7 @@ export default function MainHeader() {
   const handleSignOut = () => {
     localStorage.removeItem("mygen_auth");
     navigate("/login");
+    console.log("--");
   };
 
   useEffect(() => {
