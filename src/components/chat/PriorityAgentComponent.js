@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  CopyButton,
   Divider,
   Flex,
   Loader,
@@ -11,10 +12,12 @@ import {
   Select,
   Text,
   Title,
+  Tooltip,
+  rem,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
-import { IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
+import { IconCheck, IconCopy, IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
@@ -149,55 +152,59 @@ export default function PriorityAgentComponent() {
       <ScrollArea viewportRef={viewport} scrollHideDelay={4000} className="h-[calc(100vh-64px)]">
         <Paper p={"lg"} className="relative">
           <Flex gap={"sm"} direction={"column"}>
-            {fields.map((field, index) => (
-              <Flex gap={"md"} align={{ base: "start", md: "end" }} key={index} direction={{ base: "column", md: "row" }}>
-                <Select
-                  label="Your Skills"
-                  data={options}
-                  placeholder="Pick value"
-                  w={{ base: "100%", md: 600 }}
-                  value={field.skills}
-                  onChange={(value) => handleFieldChange(index, "skills", value)}
-                  styles={{
-                    label: {
-                      display: "flex",
-                      justifyContent: "start",
-                    },
-                  }}
-                />
-                <Flex gap={"md"} w={"100%"}>
-                  <NumberInput
-                    placeholder="Score"
-                    value={field.punteggio}
-                    onChange={(valueString) => handleFieldChange(index, "punteggio", valueString)}
-                    w={"100%"}
+            {fields.map((field, index) => {
+              const selectedSkills = fields.map((field) => field.skills);
+              const filteredOptions = options.filter((option) => !selectedSkills.includes(option) || option === field.skills);
+              return (
+                <Flex gap={"md"} align={{ base: "start", md: "end" }} key={index} direction={{ base: "column", md: "row" }}>
+                  <Select
+                    label="Your Skills"
+                    data={filteredOptions}
+                    placeholder="Pick value"
+                    w={{ base: "100%", md: 600 }}
+                    value={field.skills}
+                    onChange={(value) => handleFieldChange(index, "skills", value)}
+                    styles={{
+                      label: {
+                        display: "flex",
+                        justifyContent: "start",
+                      },
+                    }}
                   />
-                  <NumberInput
-                    placeholder="Score for moment A"
-                    value={field.punteggio_a}
-                    onChange={(valueString) => handleFieldChange(index, "punteggio_a", valueString)}
-                    w={"100%"}
-                  />
-                  <NumberInput
-                    placeholder="Score for moment B"
-                    value={field.punteggio_b}
-                    onChange={(valueString) => handleFieldChange(index, "punteggio_b", valueString)}
-                    w={"100%"}
-                  />
-                  <NumberInput
-                    placeholder="Score for moment C"
-                    value={field.punteggio_c}
-                    onChange={(valueString) => handleFieldChange(index, "punteggio_c", valueString)}
-                    w={"100%"}
-                  />
+                  <Flex gap={"md"} w={"100%"}>
+                    <NumberInput
+                      placeholder="Tot."
+                      value={field.punteggio}
+                      onChange={(valueString) => handleFieldChange(index, "punteggio", valueString)}
+                      w={"100%"}
+                    />
+                    <NumberInput
+                      placeholder="A"
+                      value={field.punteggio_a}
+                      onChange={(valueString) => handleFieldChange(index, "punteggio_a", valueString)}
+                      w={"100%"}
+                    />
+                    <NumberInput
+                      placeholder="B"
+                      value={field.punteggio_b}
+                      onChange={(valueString) => handleFieldChange(index, "punteggio_b", valueString)}
+                      w={"100%"}
+                    />
+                    <NumberInput
+                      placeholder="C"
+                      value={field.punteggio_c}
+                      onChange={(valueString) => handleFieldChange(index, "punteggio_c", valueString)}
+                      w={"100%"}
+                    />
+                  </Flex>
                   {fields.length > 1 && (
                     <ActionIcon variant="outline" color="red" radius={"xl"} mb={3} withBorder onClick={() => handleRemoveSkills(index)}>
                       <IconTrash color="red" size={"1.2rem"} />
                     </ActionIcon>
                   )}
                 </Flex>
-              </Flex>
-            ))}
+              );
+            })}
           </Flex>
           <Flex mt={"xl"} justify={"space-between"}>
             <Flex gap={"md"}>
@@ -228,6 +235,15 @@ export default function PriorityAgentComponent() {
                       <Text color={colorScheme === "light" ? "gray" : "white"} fw={500} td={"underline"}>
                         {moment().format("MM/DD/YYYY, h:mm:ss a")}
                       </Text>
+                      <CopyButton value={item.assessment} timeout={2000}>
+                        {({ copied, copy }) => (
+                          <Tooltip label={copied ? "Copied" : "Copy"} withArrow position="right">
+                            <ActionIcon color={copied ? "teal" : "gray"} variant="subtle" onClick={copy}>
+                              {copied ? <IconCheck style={{ width: rem(16) }} /> : <IconCopy style={{ width: rem(16) }} />}
+                            </ActionIcon>
+                          </Tooltip>
+                        )}
+                      </CopyButton>
                     </Flex>
                     <Text align={index % 2 !== 0 ? "right" : "left"} m={"md"}>
                       {item.assessment}
