@@ -51,7 +51,9 @@ export default function MainHeader() {
   };
 
   useEffect(() => {
-    if (!userToken) navigate("/login");
+    if (!userToken) {
+      navigate("/login");
+    }
   }, []);
 
   return (
@@ -92,9 +94,9 @@ export default function MainHeader() {
               <Menu.Item leftSection={<Avatar radius={"md"} src={""} />}>
                 <Box>
                   <Text fw={600}>{userToken?.name}</Text>
-                  <Text color="gray" fw={500} size="xs">
+                  {/* <Text color="gray" fw={500} size="xs">
                     acedev0427@gmail.com
-                  </Text>
+                  </Text> */}
                 </Box>
               </Menu.Item>
               <Menu.Divider />

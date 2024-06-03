@@ -14,7 +14,7 @@ import {
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
-import { IconChevronDown, IconChevronUp, IconPlus, IconSend } from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp, IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { FastAssessmentAPI, FastAssessmentResultFastAPI } from "../apis/FastAssessmentAPI";
@@ -79,7 +79,12 @@ export default function FastAgentComponent() {
     setFields(newFields);
   };
 
+  const handleRemoveSkills = (index) => {
+    setFields(fields.filter((_, i) => i !== index));
+  };
+
   const handleConfirm = async () => {
+    viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
     const skillDict = {};
     fields.forEach((field) => {
       skillDict[field.skills] = {
@@ -116,7 +121,6 @@ export default function FastAgentComponent() {
         } else if (!resultData.status) {
           clearInterval(interval);
           setResults((results) => [...results, { assessment: resultData.assessment, date: moment().format("MM/DD/YYYY, h:mm:ss a") }]);
-          viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
           setLoading(false);
         }
       } catch (error) {
@@ -156,6 +160,10 @@ export default function FastAgentComponent() {
       }
     };
   }, [intervalId]);
+
+  useEffect(() => {
+    viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
+  }, [results]);
 
   return (
     <Box w={"100%"} h={"100%"}>
@@ -204,16 +212,24 @@ export default function FastAgentComponent() {
                     w={"100%"}
                   />
                 </Flex>
+                {fields.length > 1 && (
+                  <ActionIcon variant="outline" color="red" radius={"xl"} mb={3} withBorder onClick={() => handleRemoveSkills(index)}>
+                    <IconTrash color="red" size={"1.2rem"} />
+                  </ActionIcon>
+                )}
               </Flex>
             ))}
           </Flex>
-          <Flex mt={"xl"} gap={"md"}>
-            <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
-              Add Field
-            </Button>
-            <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
-              Confirm
-            </Button>
+          <Flex mt={"xl"} justify={"space-between"}>
+            <Flex gap={"md"}>
+              <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
+                Add Field
+              </Button>
+              <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
+                Confirm
+              </Button>
+            </Flex>
+            <Button onClick={() => setFields([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }])}>Clear All</Button>
           </Flex>
           {results.length !== 0 && (
             <Box mt="xl">

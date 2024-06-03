@@ -3,9 +3,12 @@ import { useForm, isNotEmpty, hasLength } from "@mantine/form";
 import classes from "./AuthenticationImage.module.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { userTokenState } from "../../atoms/userAtoms";
 
 export default function SignIn() {
   const { colorScheme } = useMantineColorScheme();
+  const [user, setUser] = useRecoilState(userTokenState);
   const navigate = useNavigate();
 
   const form = useForm({
@@ -35,6 +38,7 @@ export default function SignIn() {
           password: password,
         })
       );
+      setUser(JSON.parse(localStorage.getItem("mygen_auth")));
       setTimeout(() => {
         navigate("/fast_assessment");
       }, 3000);

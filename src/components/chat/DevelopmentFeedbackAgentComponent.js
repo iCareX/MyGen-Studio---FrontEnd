@@ -14,7 +14,7 @@ import {
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
-import { IconChevronDown, IconChevronUp, IconPlus, IconSend } from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp, IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
@@ -77,6 +77,10 @@ export default function DevelopmentFeedbackAgentComponent() {
     const newFields = [...fields];
     newFields[index][field] = value;
     setFields(newFields);
+  };
+
+  const handleRemoveSkills = (index) => {
+    setFields(fields.filter((_, i) => i !== index));
   };
 
   const handleConfirm = async () => {
@@ -157,6 +161,10 @@ export default function DevelopmentFeedbackAgentComponent() {
     };
   }, [intervalId]);
 
+  useEffect(() => {
+    viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
+  }, [results]);
+
   return (
     <Box w={"100%"} h={"100%"}>
       <ScrollArea viewportRef={viewport} scrollHideDelay={4000} className="h-[calc(100vh-64px)]">
@@ -203,17 +211,26 @@ export default function DevelopmentFeedbackAgentComponent() {
                     onChange={(valueString) => handleFieldChange(index, "punteggio_c", valueString)}
                     w={"100%"}
                   />
+
+                  {fields.length > 1 && (
+                    <ActionIcon variant="outline" color="red" radius={"xl"} mb={3} withBorder onClick={() => handleRemoveSkills(index)}>
+                      <IconTrash color="red" size={"1.2rem"} />
+                    </ActionIcon>
+                  )}
                 </Flex>
               </Flex>
             ))}
           </Flex>
-          <Flex mt={"xl"} gap={"md"}>
-            <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
-              Add Field
-            </Button>
-            <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
-              Confirm
-            </Button>
+          <Flex mt={"xl"} justify={"space-between"}>
+            <Flex gap={"md"}>
+              <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
+                Add Field
+              </Button>
+              <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
+                Confirm
+              </Button>
+            </Flex>
+            <Button onClick={() => setFields([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }])}>Clear All</Button>
           </Flex>
           {results.length !== 0 && (
             <Box mt="xl">

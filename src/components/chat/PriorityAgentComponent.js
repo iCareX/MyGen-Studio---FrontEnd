@@ -1,5 +1,20 @@
-import { Box, Button, Divider, Flex, Loader, NumberInput, Paper, ScrollArea, Select, Text, Title, useMantineColorScheme, useMantineTheme } from "@mantine/core";
-import { IconPlus, IconSend } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Loader,
+  NumberInput,
+  Paper,
+  ScrollArea,
+  Select,
+  Text,
+  Title,
+  useMantineColorScheme,
+  useMantineTheme,
+} from "@mantine/core";
+import { IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
@@ -63,6 +78,10 @@ export default function PriorityAgentComponent() {
     setFields(newFields);
   };
 
+  const handleRemoveSkills = (index) => {
+    setFields(fields.filter((_, i) => i !== index));
+  };
+
   const handleConfirm = async () => {
     const skillDict = {};
     fields.forEach((field) => {
@@ -121,6 +140,10 @@ export default function PriorityAgentComponent() {
     };
   }, [intervalId]);
 
+  useEffect(() => {
+    viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
+  }, [results]);
+
   return (
     <Box w={"100%"} h={"100%"}>
       <ScrollArea viewportRef={viewport} scrollHideDelay={4000} className="h-[calc(100vh-64px)]">
@@ -167,17 +190,25 @@ export default function PriorityAgentComponent() {
                     onChange={(valueString) => handleFieldChange(index, "punteggio_c", valueString)}
                     w={"100%"}
                   />
+                  {fields.length > 1 && (
+                    <ActionIcon variant="outline" color="red" radius={"xl"} mb={3} withBorder onClick={() => handleRemoveSkills(index)}>
+                      <IconTrash color="red" size={"1.2rem"} />
+                    </ActionIcon>
+                  )}
                 </Flex>
               </Flex>
             ))}
           </Flex>
-          <Flex mt={"xl"} gap={"md"}>
-            <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
-              Add Field
-            </Button>
-            <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
-              Confirm
-            </Button>
+          <Flex mt={"xl"} justify={"space-between"}>
+            <Flex gap={"md"}>
+              <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
+                Add Field
+              </Button>
+              <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
+                Confirm
+              </Button>
+            </Flex>
+            <Button onClick={() => setFields([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }])}>Clear All</Button>
           </Flex>
           {results.length !== 0 && (
             <Box mt="xl">
