@@ -9,6 +9,8 @@ import SignIn from "../components/pages/auth/signin";
 import FastAgentComponent from "../components/chat/FastAgentComponent";
 import DevelopmentFeedbackAgentComponent from "../components/chat/DevelopmentFeedbackAgentComponent";
 import PriorityAgentComponent from "../components/chat/PriorityAgentComponent";
+import SignUp from "../components/pages/auth/signup";
+import ProfilePage from "../components/pages/profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -39,11 +41,19 @@ const router = createBrowserRouter([
         path: "control_tower",
         element: <ChatComponent />,
       },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
     ],
   },
   {
     path: "/login",
     element: <SignIn />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
   },
   {
     path: "*",

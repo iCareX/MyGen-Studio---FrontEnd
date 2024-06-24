@@ -1,15 +1,17 @@
 import { ActionIcon, Avatar, Box, Drawer, Flex, Menu, NavLink, Text, rem, useMantineColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconLogout, IconMenu2, IconMoon } from "@tabler/icons-react";
+import { IconLogout, IconMenu2, IconMoon, IconUser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DarkSwitch from "../switch/DarkSwitch";
 import { useRecoilValue } from "recoil";
-import { userTokenState } from "../atoms/userAtoms";
+import { userDataState, userTokenState } from "../atoms/userAtoms";
+import { supabase } from "../@utils/supabaseClient";
 
 export default function MainHeader() {
   const { colorScheme } = useMantineColorScheme();
   const userToken = useRecoilValue(userTokenState);
+  const userData = useRecoilValue(userDataState);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [show, setShow] = useState(false);
@@ -45,16 +47,28 @@ export default function MainHeader() {
     },
   ]);
 
-  const handleSignOut = () => {
-    localStorage.removeItem("mygen_auth");
-    navigate("/login");
-    console.log("--");
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.log("Error signing out:", error.message);
+    } else {
+      localStorage.removeItem("mygen_auth");
+      localStorage.removeItem("mygen_token");
+      navigate("/login");
+    }
+  };
+
+  const handleGetData = async () => {
+    const session = supabase.auth.getSession();
+
+    if (session) {
+      let currentDate = new Date().getTime();
+      if (currentDate > session.expires_at) handleSignOut();
+    }
   };
 
   useEffect(() => {
-    if (!userToken) {
-      navigate("/login");
-    }
+    handleGetData();
   }, []);
 
   return (
@@ -87,18 +101,21 @@ export default function MainHeader() {
           <Menu shadow="md" width={240}>
             <Menu.Target>
               <Flex align={"center"} gap={"sm"} className="hover:cursor-pointer">
-                <Text>{userToken.name}</Text>
-                <Avatar src={""} size={"md"} radius={"xl"} />
+                <Text fw={500}>{userData.first_name && userData.last_name ? userData.first_name + " " + userData.last_name : userData.email}</Text>
+                <Avatar src={userData.avatar} size={"md"} radius={"xl"} />
               </Flex>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item leftSection={<Avatar radius={"md"} src={""} />}>
+              <Menu.Item leftSection={<Avatar radius={"md"} src={userData.avatar} />}>
                 <Box>
-                  <Text fw={600}>{userToken?.name}</Text>
-                  {/* <Text color="gray" fw={500} size="xs">
-                    acedev0427@gmail.com
-                  </Text> */}
+                  <Text fw={600}>{userData?.first_name + userData?.last_name}</Text>
+                  <Text color="gray" fw={500} size="xs">
+                    {userData.email}
+                  </Text>
                 </Box>
+              </Menu.Item>
+              <Menu.Item leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />} onClick={() => navigate("/profile")}>
+                Profile
               </Menu.Item>
               <Menu.Divider />
               <Menu.Item leftSection={<IconMoon style={{ width: rem(14), height: rem(14) }} />} rightSection={<DarkSwitch />}>
@@ -124,9 +141,9 @@ export default function MainHeader() {
       >
         <Box h={"100%"} w={320} p={"xs"}>
           <Flex direction={"column"} align={"start"} gap={"md"} mt={"sm"}>
-            {navList.map((item, index) => {
+            {navList.map((item, mainIndex) => {
               return (
-                <>
+                <div key={mainIndex}>
                   <Text size="sm" fw={700} mb={-10}>
                     {item.type}
                   </Text>
@@ -152,7 +169,7 @@ export default function MainHeader() {
                       />
                     );
                   })}
-                </>
+                </div>
               );
             })}
           </Flex>

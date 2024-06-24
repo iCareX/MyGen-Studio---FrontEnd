@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Collapse,
   CopyButton,
   Divider,
   Flex,
@@ -17,15 +18,19 @@ import {
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
-import { IconCheck, IconCopy, IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
+import { IconCheck, IconChevronDown, IconChevronUp, IconCopy, IconPlus, IconSend, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
 import { PrioritiesAssessmentAPI, PrioritiesAssessmentResultAPI } from "../apis/PriorityAgentAPI";
+import { supabase } from "../@utils/supabaseClient";
+import { useRecoilValue } from "recoil";
+import { userDataState } from "../atoms/userAtoms";
 
 export default function PriorityAgentComponent() {
   const viewport = useRef(null);
   const { colorScheme } = useMantineColorScheme();
+  const userData = useRecoilValue(userDataState);
 
   const [loading, setLoading] = useState(false);
   const [fields, setFields] = useState([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }]);
@@ -33,6 +38,8 @@ export default function PriorityAgentComponent() {
   const [results, setResults] = useState([]);
 
   const [intervalId, setInvetervalId] = useState();
+
+  const [openedStates, setOpenedStates] = useState({});
 
   const [options, setOptions] = useState([
     "Problem solving",
@@ -70,6 +77,8 @@ export default function PriorityAgentComponent() {
   ]);
 
   const Color = ["blue", "green", "orange", "grape", "pink", "indigo", "cyan", "teal", "yellow"];
+
+  const [fetchLoading, setFetchLoading] = useState(false);
 
   const handleAddField = () => {
     setFields([...fields, { skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }]);
@@ -117,12 +126,14 @@ export default function PriorityAgentComponent() {
         const resultData = resultResponse.data;
         if (resultData.status && resultData.status !== "pending") {
           clearInterval(interval);
-          setResults((results) => [...results, { assessment: resultData.assessment, date: moment().format("MM/DD/YYYY, h:mm:ss a") }]);
           setLoading(false);
         } else if (!resultData.status) {
           clearInterval(interval);
-          setResults((results) => [...results, { assessment: resultData.assessment, date: moment().format("MM/DD/YYYY, h:mm:ss a") }]);
-          viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
+          const { data: insertedData, error } = await supabase
+            .from("priority_agent")
+            .insert([{ assessment: resultData.assessment, user_id: userData.id }])
+            .select();
+          setResults((results) => [...results, insertedData[0]]);
           setLoading(false);
         }
       } catch (error) {
@@ -135,6 +146,32 @@ export default function PriorityAgentComponent() {
     setInvetervalId(interval);
   };
 
+  const handleFetchData = async () => {
+    setFetchLoading(true);
+    const { data: fast_data } = await supabase.from("priority_agent").select().eq("user_id", userData.id);
+    setResults(fast_data);
+    setFetchLoading(false);
+  };
+
+  const handleToggle = (index) => {
+    const uniqueId = `${index}`;
+
+    setOpenedStates((prevOpenedStates) => ({
+      ...prevOpenedStates,
+      [uniqueId]: !prevOpenedStates[uniqueId],
+    }));
+  };
+
+  const handleDelete = async (id) => {
+    const { data: deletedData, error: message } = await supabase.from("priority_agent").delete().eq("id", id);
+    if (!message) {
+      toast.success("Assessment Delete Successfully");
+    } else {
+      toast.error("Error");
+    }
+    handleFetchData();
+  };
+
   useEffect(() => {
     return () => {
       if (intervalId) {
@@ -144,8 +181,14 @@ export default function PriorityAgentComponent() {
   }, [intervalId]);
 
   useEffect(() => {
+    handleFetchData();
+  }, []);
+
+  useEffect(() => {
     viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
   }, [results]);
+
+  console.log("-----", results);
 
   return (
     <Box w={"100%"} h={"100%"}>
@@ -232,22 +275,29 @@ export default function PriorityAgentComponent() {
                     withBorder={colorScheme === "light" ? false : true}
                   >
                     <Flex className=" rounded-sm w-full" bg={Color[index % 9]} p={"sm"} align={"center"} justify={"space-between"}>
-                      <Text color={colorScheme === "light" ? "gray" : "white"} fw={500} td={"underline"}>
-                        {moment().format("MM/DD/YYYY, h:mm:ss a")}
+                      <Text color={"white"} fw={500} td={"underline"}>
+                        {moment(item.created_at).format("MM/DD/YYYY, h:mm:ss a")}
                       </Text>
-                      <CopyButton value={item.assessment} timeout={2000}>
-                        {({ copied, copy }) => (
-                          <Tooltip label={copied ? "Copied" : "Copy"} withArrow position="right">
-                            <ActionIcon color={copied ? "teal" : "white"} variant="subtle" onClick={copy}>
-                              {copied ? <IconCheck style={{ width: rem(16) }} /> : <IconCopy style={{ width: rem(16) }} />}
-                            </ActionIcon>
-                          </Tooltip>
-                        )}
-                      </CopyButton>
+                      <Flex>
+                        <CopyButton value={item.assessment} timeout={2000}>
+                          {({ copied, copy }) => (
+                            <Tooltip label={copied ? "Copied" : "Copy"} withArrow position="right">
+                              <ActionIcon color={copied ? "teal" : "white"} variant="subtle" onClick={copy}>
+                                {copied ? <IconCheck style={{ width: rem(16) }} /> : <IconCopy style={{ width: rem(16) }} />}
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                        </CopyButton>
+                        <ActionIcon variant="transparent" onClick={() => handleToggle(index)}>
+                          {openedStates[`${index}`] ? <IconChevronUp size={"1.6rem"} color="white" /> : <IconChevronDown size={"1.6rem"} color="white" />}
+                        </ActionIcon>
+                      </Flex>
                     </Flex>
-                    <Text align={index % 2 !== 0 ? "right" : "left"} m={"md"}>
-                      {item.assessment}
-                    </Text>
+                    <Collapse in={openedStates[`${index}`] !== false} p={"md"}>
+                      <Text align={index % 2 !== 0 ? "right" : "left"} m={"md"}>
+                        {item.assessment}
+                      </Text>
+                    </Collapse>
                   </Paper>
                 ))}
               </Box>

@@ -52,8 +52,8 @@ export default function MainSidebar(props) {
       <Flex direction={"column"} align={"start"} gap={"md"} mt={"sm"}>
         {navList.map((item, index) => {
           return (
-            <>
-              <Text size="sm" fw={700} mb={-10}>
+            <div key={index}>
+              <Text size="sm" fw={700}>
                 {item.type}
               </Text>
               {item?.menu.map((subItem, subIndex) => {
@@ -75,7 +75,7 @@ export default function MainSidebar(props) {
                   />
                 );
               })}
-            </>
+            </div>
           );
         })}
         {/* {chat.map((item, index) => {

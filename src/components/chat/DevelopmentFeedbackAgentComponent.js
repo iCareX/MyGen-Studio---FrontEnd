@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
 import { DevelopmentFeedbackAPI, DevelopmentFeedbackResultAPI } from "../apis/DevelopmentAgentAPI";
+import { supabase } from "../@utils/supabaseClient";
 
 export default function DevelopmentFeedbackAgentComponent() {
   const viewport = useRef(null);
@@ -72,6 +73,8 @@ export default function DevelopmentFeedbackAgentComponent() {
   const Color = ["blue", "green", "orange", "grape", "pink", "indigo", "cyan", "teal", "yellow"];
   const [openedStates, setOpenedStates] = useState({});
 
+  const [fetchLoading, setFetchLoading] = useState(false);
+
   const handleAddField = () => {
     setFields([...fields, { skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }]);
   };
@@ -119,12 +122,14 @@ export default function DevelopmentFeedbackAgentComponent() {
 
         if (resultData.status && resultData.status !== "pending") {
           clearInterval(interval);
-          setResults((results) => [...results, { assessment: resultData.assessment, date: moment().format("MM/DD/YYYY, h:mm:ss a") }]);
           setLoading(false);
         } else if (!resultData.status) {
           clearInterval(interval);
-          setResults((results) => [...results, { assessment: resultData.assessment, date: moment().format("MM/DD/YYYY, h:mm:ss a") }]);
-          viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
+          const { data: insertedData, error } = await supabase
+            .from("development_feedback_agent")
+            .insert([{ assessment: resultData.assessment }])
+            .select();
+          setResults((results) => [...results, insertedData[0]]);
           setLoading(false);
         }
       } catch (error) {
@@ -145,6 +150,23 @@ export default function DevelopmentFeedbackAgentComponent() {
     }));
   };
 
+  const handleFetchData = async () => {
+    setFetchLoading(true);
+    const { data: fast_data } = await supabase.from("development_feedback_agent").select();
+    setResults(fast_data);
+    setFetchLoading(false);
+  };
+
+  const handleDelete = async (id) => {
+    const { data: deletedData, error: message } = await supabase.from("development_feedback_agent").delete().eq("id", id);
+    if (!message) {
+      toast.success("Assessment Delete Successfully");
+    } else {
+      toast.error("Error");
+    }
+    handleFetchData();
+  };
+
   useEffect(() => {
     const initialStates = {};
     results.forEach((item, index) => {
@@ -163,6 +185,10 @@ export default function DevelopmentFeedbackAgentComponent() {
       }
     };
   }, [intervalId]);
+
+  useEffect(() => {
+    handleFetchData();
+  }, []);
 
   useEffect(() => {
     viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
@@ -244,9 +270,14 @@ export default function DevelopmentFeedbackAgentComponent() {
               <Box pos="relative">
                 {results.map((item, index) => (
                   <Paper key={index} shadow="lg" p={"sm"} mb={"md"} withBorder={colorScheme === "light" ? false : true}>
-                    <Text color={colorScheme === "light" ? "gray" : ""} fw={500} mb={"sm"}>
-                      {moment().format("MM/DD/YYYY, h:mm:ss a")}
-                    </Text>
+                    <Flex gap={"sm"} justify={"space-between"} align={"center"}>
+                      <Text color={colorScheme === "light" ? "gray" : ""} fw={500} mb={"sm"}>
+                        {moment(item.created_at).format("MM/DD/YYYY, h:mm:ss a")}
+                      </Text>
+                      <ActionIcon variant="transparent" onClick={() => handleDelete(item.id)}>
+                        <IconTrash size={"1rem"} color={colorScheme === "light" ? "gray" : "white"} />
+                      </ActionIcon>
+                    </Flex>
                     {Object.keys(item.assessment).map((key, subIndex) => (
                       <Box key={subIndex} ml={subIndex % 2 !== 0 ? "auto" : ""} w={{ base: "85%", xl: "70%" }}>
                         <Paper key={key} radius={"sm"} shadow="sm" mb="md" withBorder={colorScheme === "light" ? false : true}>
