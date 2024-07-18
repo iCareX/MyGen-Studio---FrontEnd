@@ -56,7 +56,7 @@ export default function ChatComponent() {
 
   const getPrediction = async () => {
     setLoading(true);
-    const ngrok_url = process.env.REACT_APP_PUBLIC_URL;
+    const ngrok_url = process.env.VITE_APP_PUBLIC_URL;
     let input_data = {
       input: prompt,
     };

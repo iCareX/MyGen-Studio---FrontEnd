@@ -1,8 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
 import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import { MantineProvider, createTheme } from "@mantine/core";
 import { RouterProvider } from "react-router-dom";
 import router from "./Router/router";
@@ -11,10 +10,6 @@ import { ModalsProvider } from "@mantine/modals";
 import ChatShareModal from "./components/modals/chat/Share";
 import ChatDeleteModal from "./components/modals/chat/Delete";
 import { RecoilRoot } from "recoil";
-
-import "@mantine/dropzone/styles.css";
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
 
 const theme = createTheme({
   breakpoints: {
@@ -36,10 +31,10 @@ const theme = createTheme({
   // },
 });
 
-root.render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RecoilRoot>
-      <MantineProvider theme={theme}>
+      <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
         <ModalsProvider
           modals={{
             chatTitleEdit: ChatTitleEditModal,
@@ -55,8 +50,3 @@ root.render(
     </RecoilRoot>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
