@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 // import { handleUpload } from "@/app/utils/apis";
 import { formatFileSize } from "../../apis/simpleAPI";
 import PdfViewer from "./pdfViewer";
+import axios from "axios";
 
 export default function PDFUpload() {
   const fileInputRef = useRef(null);
@@ -30,13 +31,29 @@ export default function PDFUpload() {
   const [addMoreFiles, setAddMoreFiles] = useState();
   const [files, setFiles] = useState(null);
 
+  const [result, setResult] = useState("");
+
   const handleFileUpload = async () => {
     setLoading(true);
     const formData = new FormData();
-    let newArray = originFiles.concat(addMoreFiles);
-
+    let newArray;
+    if (addMoreFiles) newArray = originFiles.concat(addMoreFiles);
+    else newArray = originFiles;
     for (let i = 0; i < newArray.length; i++) {
       formData.append("files", newArray[i]);
+    }
+    console.log(formData);
+    try {
+      const response = await axios.post("https://d918-34-46-17-178.ngrok-free.app/process", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setResult(JSON.stringify(response.data, null, 2));
+      setLoading(false);
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      setLoading(false);
     }
 
     // await handleUpload(formData)
@@ -73,21 +90,16 @@ export default function PDFUpload() {
       <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: "pink", type: "dots" }} />
       <Paper w={"100%"} p={"xl"}>
         {originFiles && originFiles.length > 0 && (
-          <Flex justify={"space-between"} align={"center"}>
+          <Flex justify={"space-between"} align={{ base: "start", sm: "center" }} gap={"sm"} direction={{ base: "column-reverse", sm: "row" }}>
             <Alert
               variant="light"
               color="green"
               title={`You uploaded ${(originFiles && originFiles.length) + (addMoreFiles && addMoreFiles.length)} files successfully`}
               icon={<IconCircleCheck />}
+              w={{ base: "100%", sm: "fit-content" }}
             />
             <Flex gap={"md"}>
-              <Button
-                color="gray"
-                variant="outline"
-                loading={loading}
-                onClick={() => fileInputRef.current.click()}
-                disabled={add && addMoreFiles && addMoreFiles.length > 0}
-              >
+              <Button color="gray" variant="outline" onClick={() => fileInputRef.current.click()} disabled={add && addMoreFiles && addMoreFiles.length > 0}>
                 Add More
               </Button>
               <div className="hidden">
@@ -101,7 +113,7 @@ export default function PDFUpload() {
                   onChange={handleAddMoreFilesUpload}
                 />
               </div>
-              <Button color="green" variant="outline" loading={loading} onClick={handleFileUpload}>
+              <Button color="green" variant="outline" onClick={handleFileUpload}>
                 Upload All
               </Button>
               <Button
@@ -127,7 +139,7 @@ export default function PDFUpload() {
           </Drawer>
           {originFiles && originFiles.length > 0 ? (
             <Box w={"100%"}>
-              <SimpleGrid cols={3} w={"100%"} mt={"lg"}>
+              <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} w={"100%"} mt={"lg"}>
                 {originFiles
                   .sort((a, b) => {
                     const nameA = a.type.split("/")[1].toUpperCase();
@@ -301,6 +313,7 @@ export default function PDFUpload() {
             </Dropzone>
           )}
         </Flex>
+        <pre>{result}</pre>
       </Paper>
     </Box>
   );

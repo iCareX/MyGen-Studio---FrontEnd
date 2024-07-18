@@ -278,7 +278,17 @@ export default function FastAgentComponent() {
               </Flex>
             </Box>
           ) : (
-            <ExcelUpload originFiles={originFiles} setOriginFiles={setOriginFiles} convertedFiles={convertedFiles} setConvertedFiles={setConvertedFiles} />
+            <ExcelUpload
+              options={options}
+              originFiles={originFiles}
+              setOriginFiles={setOriginFiles}
+              convertedFiles={convertedFiles}
+              setConvertedFiles={setConvertedFiles}
+              fields={fields}
+              setFields={setFields}
+              handleConfirm={handleConfirm}
+              handleFieldChange={handleFieldChange}
+            />
           )}
 
           {results.length !== 0 && (
