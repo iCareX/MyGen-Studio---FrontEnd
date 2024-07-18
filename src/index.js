@@ -12,6 +12,8 @@ import ChatShareModal from "./components/modals/chat/Share";
 import ChatDeleteModal from "./components/modals/chat/Delete";
 import { RecoilRoot } from "recoil";
 
+import "@mantine/dropzone/styles.css";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 const theme = createTheme({

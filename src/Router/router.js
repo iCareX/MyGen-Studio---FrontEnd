@@ -9,6 +9,7 @@ import SignIn from "../components/pages/auth/signin";
 import FastAgentComponent from "../components/chat/FastAgentComponent";
 import DevelopmentFeedbackAgentComponent from "../components/chat/DevelopmentFeedbackAgentComponent";
 import PriorityAgentComponent from "../components/chat/PriorityAgentComponent";
+import PDFUpload from "../components/chat/pdfUpload/pdfUpload";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "control_tower",
         element: <ChatComponent />,
+      },
+      {
+        path: "pdf_upload",
+        element: <PDFUpload />,
       },
     ],
   },

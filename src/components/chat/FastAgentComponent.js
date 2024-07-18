@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Center,
   Collapse,
   CopyButton,
   Divider,
@@ -10,6 +11,7 @@ import {
   NumberInput,
   Paper,
   ScrollArea,
+  SegmentedControl,
   Select,
   Text,
   Title,
@@ -22,6 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { FastAssessmentAPI, FastAssessmentResultFastAPI } from "../apis/FastAssessmentAPI";
 import moment from "moment/moment";
+import ExcelUpload from "./ExcelUpload/excelUpload";
 
 export default function FastAgentComponent() {
   const viewport = useRef(null);
@@ -172,76 +175,112 @@ export default function FastAgentComponent() {
     viewport.current?.scrollTo({ top: viewport.current.scrollHeight });
   }, [results]);
 
+  const [type, setType] = useState("manual");
+
+  const [originFiles, setOriginFiles] = useState();
+  const [convertedFiles, setConvertedFiles] = useState();
+
   return (
     <Box w={"100%"} h={"100%"}>
       <ScrollArea viewportRef={viewport} scrollHideDelay={4000} className="h-[calc(100vh-64px)]">
         <Paper p={"lg"} className="relative">
-          <Flex gap={"sm"} direction={"column"}>
-            {fields.map((field, index) => {
-              const selectedSkills = fields.map((field) => field.skills);
-              const filteredOptions = options.filter((option) => !selectedSkills.includes(option) || option === field.skills);
-              return (
-                <Flex gap={"md"} align={{ base: "start", md: "end" }} key={index} direction={{ base: "column", md: "row" }}>
-                  <Select
-                    label="Your Skills"
-                    data={filteredOptions}
-                    placeholder="Pick value"
-                    w={{ base: "100%", md: 600 }}
-                    value={field.skills}
-                    onChange={(value) => handleFieldChange(index, "skills", value)}
-                    styles={{
-                      label: {
-                        display: "flex",
-                        justifyContent: "start",
-                      },
-                    }}
-                  />
-                  <Flex gap={"md"} w={"100%"}>
-                    <NumberInput
-                      placeholder="Tot."
-                      value={field.punteggio}
-                      onChange={(valueString) => handleFieldChange(index, "punteggio", valueString)}
-                      w={"100%"}
-                    />
-                    <NumberInput
-                      placeholder="A"
-                      value={field.punteggio_a}
-                      onChange={(valueString) => handleFieldChange(index, "punteggio_a", valueString)}
-                      w={"100%"}
-                    />
-                    <NumberInput
-                      placeholder="B"
-                      value={field.punteggio_b}
-                      onChange={(valueString) => handleFieldChange(index, "punteggio_b", valueString)}
-                      w={"100%"}
-                    />
-                    <NumberInput
-                      placeholder="C"
-                      value={field.punteggio_c}
-                      onChange={(valueString) => handleFieldChange(index, "punteggio_c", valueString)}
-                      w={"100%"}
-                    />
-                  </Flex>
-                  {fields.length > 1 && (
-                    <ActionIcon variant="outline" color="red" radius={"xl"} mb={3} withBorder onClick={() => handleRemoveSkills(index)}>
-                      <IconTrash color="red" size={"1.2rem"} />
-                    </ActionIcon>
-                  )}
+          <SegmentedControl
+            size="sm"
+            value={type}
+            onChange={(value) => setType(value)}
+            data={[
+              {
+                value: "manual",
+                label: (
+                  <Center>
+                    <Box ml={10}>Manual</Box>
+                  </Center>
+                ),
+              },
+              {
+                value: "excel",
+                label: (
+                  <Center>
+                    <Box ml={10}>Using Excel</Box>
+                  </Center>
+                ),
+              },
+            ]}
+            mb={"sm"}
+          />
+          {type === "manual" ? (
+            <Box>
+              <Flex gap={"sm"} direction={"column"}>
+                {fields.map((field, index) => {
+                  const selectedSkills = fields.map((field) => field.skills);
+                  const filteredOptions = options.filter((option) => !selectedSkills.includes(option) || option === field.skills);
+                  return (
+                    <Flex gap={"md"} align={{ base: "start", md: "end" }} key={index} direction={{ base: "column", md: "row" }}>
+                      <Select
+                        label="Your Skills"
+                        data={filteredOptions}
+                        placeholder="Pick value"
+                        w={{ base: "100%", md: 600 }}
+                        value={field.skills}
+                        onChange={(value) => handleFieldChange(index, "skills", value)}
+                        styles={{
+                          label: {
+                            display: "flex",
+                            justifyContent: "start",
+                          },
+                        }}
+                      />
+                      <Flex gap={"md"} w={"100%"}>
+                        <NumberInput
+                          placeholder="Tot."
+                          value={field.punteggio}
+                          onChange={(valueString) => handleFieldChange(index, "punteggio", valueString)}
+                          w={"100%"}
+                        />
+                        <NumberInput
+                          placeholder="A"
+                          value={field.punteggio_a}
+                          onChange={(valueString) => handleFieldChange(index, "punteggio_a", valueString)}
+                          w={"100%"}
+                        />
+                        <NumberInput
+                          placeholder="B"
+                          value={field.punteggio_b}
+                          onChange={(valueString) => handleFieldChange(index, "punteggio_b", valueString)}
+                          w={"100%"}
+                        />
+                        <NumberInput
+                          placeholder="C"
+                          value={field.punteggio_c}
+                          onChange={(valueString) => handleFieldChange(index, "punteggio_c", valueString)}
+                          w={"100%"}
+                        />
+                      </Flex>
+                      {fields.length > 1 && (
+                        <ActionIcon variant="outline" color="red" radius={"xl"} mb={3} withBorder onClick={() => handleRemoveSkills(index)}>
+                          <IconTrash color="red" size={"1.2rem"} />
+                        </ActionIcon>
+                      )}
+                    </Flex>
+                  );
+                })}
+              </Flex>
+              <Flex mt={"xl"} justify={"space-between"}>
+                <Flex gap={"md"}>
+                  <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
+                    Add Field
+                  </Button>
+                  <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
+                    Confirm
+                  </Button>
                 </Flex>
-              );
-            })}
-          </Flex>
-          <Flex mt={"xl"} justify={"space-between"}>
-            <Flex gap={"md"}>
-              <Button onClick={handleAddField} variant="outline" leftSection={<IconPlus size={"0.9rem"} />}>
-                Add Field
-              </Button>
-              <Button onClick={handleConfirm} leftSection={<IconSend size={"0.9rem"} />} loading={loading}>
-                Confirm
-              </Button>
-            </Flex>
-            <Button onClick={() => setFields([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }])}>Clear All</Button>
-          </Flex>
+                <Button onClick={() => setFields([{ skills: "", punteggio: "", punteggio_a: "", punteggio_b: "", punteggio_c: "" }])}>Clear All</Button>
+              </Flex>
+            </Box>
+          ) : (
+            <ExcelUpload originFiles={originFiles} setOriginFiles={setOriginFiles} convertedFiles={convertedFiles} setConvertedFiles={setConvertedFiles} />
+          )}
+
           {results.length !== 0 && (
             <Box mt="xl">
               <Divider my="xs" label={<Title order={3}>Assessment Results</Title>} labelPosition="center" variant="dashed" />
