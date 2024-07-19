@@ -26,10 +26,10 @@ export default function MainSidebar(props) {
           label: "Control tower",
           link: "control_tower",
         },
-        {
-          label: "PDF Upload",
-          link: "pdf_upload",
-        },
+        // {
+        //   label: "PDF Upload",
+        //   link: "pdf_upload",
+        // },
       ],
     },
     {

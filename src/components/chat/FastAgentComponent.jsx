@@ -193,7 +193,7 @@ export default function FastAgentComponent() {
                 value: "manual",
                 label: (
                   <Center>
-                    <Box ml={10}>Manual</Box>
+                    <Box ml={10}>Manuale</Box>
                   </Center>
                 ),
               },
@@ -201,7 +201,7 @@ export default function FastAgentComponent() {
                 value: "excel",
                 label: (
                   <Center>
-                    <Box ml={10}>Using Excel</Box>
+                    <Box ml={10}>Upload</Box>
                   </Center>
                 ),
               },

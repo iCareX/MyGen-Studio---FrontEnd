@@ -11,6 +11,7 @@ import {
   LoadingOverlay,
   Paper,
   rem,
+  ScrollArea,
   Select,
   SimpleGrid,
   Stack,
@@ -27,6 +28,8 @@ export default function ExcelUpload(props) {
   const { originFiles, setOriginFiles, convertedFiles, setConvertedFiles, options, fields, setFields, handleFieldChange, handleConfirm } = props;
   const [loading, setLoading] = useState(false);
 
+  const [validation, setValidation] = useState(false);
+
   // const handleCheckValue = (value) => {
   //   const labelSet = new Set(originFiles.map((item) => item[0].toLowerCase()));
   //   let requiredLabels = [];
@@ -41,7 +44,7 @@ export default function ExcelUpload(props) {
     readXlsxFile(acceptedFiles[0]).then((res) => {
       setOriginFiles(res);
 
-      const data = res.map((item) => {
+      const data = res.slice(1).map((item, index) => {
         return [
           { value: item[0], readOnly: true },
           { value: item[1], readOnly: true },
@@ -50,6 +53,7 @@ export default function ExcelUpload(props) {
           { value: item[4], readOnly: true },
         ];
       });
+
       setFields(
         data.map((item) => ({
           skills: item[0].value ? item[0].value : 0,
@@ -59,6 +63,26 @@ export default function ExcelUpload(props) {
           punteggio_c: item[4].value ? item[4].value : 0,
         }))
       );
+
+      data.forEach((item) => {
+        let found = false;
+        let relevantOptions = [];
+
+        options.forEach((optionList) => {
+          if (optionList.includes(item[0].value)) {
+            found = true;
+            relevantOptions.push(...optionList.slice(0, 3));
+          }
+        });
+        if (!found) {
+          toast.warn(
+            `Per favore, controlla il tuo Template, la capacità "${item[0].value}" non esiste. 
+            Ecco alcuni esempi delle capacità gestite dall'AI:
+            ${relevantOptions.join(", ")}`
+          );
+        }
+      });
+
       setConvertedFiles(data);
     });
   };
@@ -70,14 +94,14 @@ export default function ExcelUpload(props) {
       <Paper w={"100%"} mt={"lg"}>
         {convertedFiles && convertedFiles.length > 0 && (
           <Flex align={"center"} justify={"space-between"}>
-            <Alert variant="light" color="green" title={`You can see all data correctly!`} icon={<IconCircleCheck />} />
+            <Alert variant="light" color="green" title={`Controlla i tuoi dati prima di confermare!`} icon={<IconCircleCheck />} />
             {/* {handleCheckValue(["capacity", "a", "b", "c", "total score"]) ? (
               <Alert variant="light" color="green" title={`You can see all data correctly!`} icon={<IconCircleCheck />} />
             ) : (
               <Alert variant="light" color="orange" title={`Some data missed in Excel!`} icon={<IconInfoCircle />} />
             )} */}
             <Flex gap={"sm"}>
-              <Button leftSection={<IconSend size={"0.9rem"} />} variant="outline" onClick={handleConfirm}>
+              <Button leftSection={<IconSend size={"0.9rem"} />} variant="outline" onClick={handleConfirm} loading={loading} disabled={validation}>
                 Confirm
               </Button>
               <Button
@@ -87,6 +111,7 @@ export default function ExcelUpload(props) {
                 onClick={() => {
                   setOriginFiles();
                   setConvertedFiles();
+                  setValidation(false);
                 }}
               >
                 Refresh
@@ -182,7 +207,7 @@ export default function ExcelUpload(props) {
               </Dropzone.Idle>
 
               <div>
-                <Text size="xl">In this step, you can Upload Excel what you want extract the information</Text>
+                <Text size="xl">Clicca qui per caricare il template excel !</Text>
                 <Text size="sm" c="dimmed" mt={7}>
                   Attach as many files as you like, each file should not exceed 5mb
                 </Text>
