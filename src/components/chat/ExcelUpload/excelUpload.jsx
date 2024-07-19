@@ -75,11 +75,7 @@ export default function ExcelUpload(props) {
           }
         });
         if (!found) {
-          toast.warn(
-            `Per favore, controlla il tuo Template, la capacità "${item[0].value}" non esiste. 
-            Ecco alcuni esempi delle capacità gestite dall'AI:
-            ${relevantOptions.join(", ")}`
-          );
+          toast.warn(`Per favore, controlla il tuo Template, la capacità "${item[0].value}" non esiste.`);
         }
       });
 
