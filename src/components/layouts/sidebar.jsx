@@ -52,7 +52,7 @@ export default function MainSidebar(props) {
   ]);
 
   return (
-    <Box h={"100%"} w={420} p={"xs"} className="border-r-[1px] sm:block hidden">
+    <Box h={"100%"} w={350} p={"xs"} className="border-r-[1px] sm:block hidden">
       <Flex direction={"column"} align={"start"} gap={"md"} mt={"sm"}>
         {navList.map((item, index) => {
           return (
@@ -70,8 +70,18 @@ export default function MainSidebar(props) {
                         fontSize: "16px",
                       },
                       root: {
-                        backgroundColor: window.location.href.includes(subItem.link) ? (colorScheme === "light" ? "#F4F4F5" : "#333337") : "",
-                        border: window.location.href.includes(subItem.link) ? (colorScheme === "light" ? "1px solid #E4E4E7" : "") : "",
+                        backgroundColor: window.location.href.includes(
+                          subItem.link
+                        )
+                          ? colorScheme === "light"
+                            ? "#F4F4F5"
+                            : "#333337"
+                          : "",
+                        border: window.location.href.includes(subItem.link)
+                          ? colorScheme === "light"
+                            ? "1px solid #E4E4E7"
+                            : ""
+                          : "",
                         borderRadius: "8px",
                       },
                     }}

@@ -38,6 +38,7 @@ import {
   PrioritiesAssessmentResultAPI,
 } from "../apis/PriorityAgentAPI";
 import ExcelUpload from "./ExcelUpload/excelUpload";
+import BottomToTop from "../@utils/bottomTotop";
 
 export default function PriorityAgentComponent() {
   const viewport = useRef(null);
@@ -211,12 +212,15 @@ export default function PriorityAgentComponent() {
   const [originFiles, setOriginFiles] = useState();
   const [convertedFiles, setConvertedFiles] = useState();
 
+  const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+
   return (
     <Box w={"100%"} h={"100%"}>
       <ScrollArea
         viewportRef={viewport}
         scrollHideDelay={4000}
         className="h-[calc(100vh-64px)]"
+        onScrollPositionChange={onScrollPositionChange}
       >
         <Paper p={"lg"} className="relative">
           <SegmentedControl
@@ -469,14 +473,17 @@ export default function PriorityAgentComponent() {
                             align={"center"}
                             justify={"space-between"}
                           >
-                            <Text
-                              color={"white"}
-                              fw={600}
-                              size="lg"
-                              align={index % 2 !== 0 ? "right" : "left"}
-                            >
-                              {key}
-                            </Text>
+                            <Tooltip label={key}>
+                              <Text
+                                color={"white"}
+                                fw={600}
+                                size="lg"
+                                align={index % 2 !== 0 ? "right" : "left"}
+                                lineClamp={1}
+                              >
+                                {key}
+                              </Text>
+                            </Tooltip>
                             <Flex>
                               <CopyButton
                                 value={item.assessment[key]}
@@ -536,6 +543,7 @@ export default function PriorityAgentComponent() {
           )}
           {loading && <Loader color="blue" type="dots" mt={"md"} />}
         </Paper>
+        <BottomToTop scrollPosition={scrollPosition} viewport={viewport} />
       </ScrollArea>
     </Box>
   );

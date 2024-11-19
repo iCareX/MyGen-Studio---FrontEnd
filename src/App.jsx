@@ -19,7 +19,8 @@ function App() {
 
   useEffect(() => {
     if (userToken) {
-      if (location.pathname === "/" || location.pathname === "") navigate("/fast_assessment");
+      if (location.pathname === "/" || location.pathname === "")
+        navigate("/fast_assessment");
     } else {
       navigate("/login");
     }
